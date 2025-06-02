@@ -31,7 +31,7 @@ const Login = () => {
     const res = await loginUser(emailRef.current, passwordRef.current);
     setIsLoading(false)
     if (!res.success) {
-      Alert.alert("Sign up", res.msg);
+      Alert.alert("Login", res.msg);
     }
   };
 

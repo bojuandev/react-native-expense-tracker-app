@@ -35,7 +35,9 @@ const Register = () => {
       nameRef.current
     );
     setIsLoading(false);
-    console.log("Register res -->", res);
+    if(!res.success) {
+      Alert.alert("Sign up", res.msg)
+    }
   };
 
   return (

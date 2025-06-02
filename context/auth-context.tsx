@@ -1,5 +1,6 @@
 import { auth, firestore } from "@/config/firebase";
 import { AuthContextType, UserType } from "@/types";
+import { router } from "expo-router";
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
@@ -17,8 +18,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (firebaseUser) => {
-      console.log("Firebase user -->", user);
+      console.log("firebaseUser -->", firebaseUser);
+      if (firebaseUser) {
+        setUser({
+          uid: firebaseUser.uid,
+          email: firebaseUser.email,
+          name: firebaseUser.displayName,
+        });
+        updateUserData(firebaseUser.uid);
+        router.replace("/(tabs)");
+      } else {
+        setUser(null);
+        router.replace("/(auth)/welcome");
+      }
     });
+
+    return () => unsub();
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -26,7 +41,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       await signInWithEmailAndPassword(auth, email, password);
       return { success: true };
     } catch (error: any) {
-      return { success: false, message: error.message };
+      let msg = error.message;
+      if (msg.includes("(auth/invalid-credential)")) msg = "Wrong credentials";
+      return { success: false, msg };
     }
   };
 
@@ -45,7 +62,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       });
       return { success: true };
     } catch (error: any) {
-      return { success: false, message: error.message };
+      let msg = error.message;
+      if (msg.includes("(auth/email-already-in-use)"))
+        msg = "This email is already in use";
+      if (msg.includes("(auth/invalid-email)")) msg = "Invalid email";
+
+      return { success: false, msg };
     }
   };
 
