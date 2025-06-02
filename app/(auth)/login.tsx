@@ -9,6 +9,7 @@ import Input from "@/components/input";
 import ScreenWrapper from "@/components/screen-wrapper";
 import Typo from "@/components/typo";
 import { colors, spacingX, spacingY } from "@/constants/theme";
+import { useAuth } from "@/context/auth-context";
 import { verticalScale } from "@/utils/styling";
 
 const Login = () => {
@@ -18,17 +19,20 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
+  const { login: loginUser } = useAuth();
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!emailRef.current || !passwordRef.current) {
       Alert.alert("Login", "Please fill all the fields");
       return;
     }
 
-    console.log({
-        email: emailRef.current,
-        password: passwordRef.current,
-    })
+    setIsLoading(true);
+    const res = await loginUser(emailRef.current, passwordRef.current);
+    setIsLoading(false)
+    if (!res.success) {
+      Alert.alert("Sign up", res.msg);
+    }
   };
 
   return (

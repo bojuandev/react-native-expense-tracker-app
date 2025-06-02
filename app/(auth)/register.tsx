@@ -9,6 +9,7 @@ import Input from "@/components/input";
 import ScreenWrapper from "@/components/screen-wrapper";
 import Typo from "@/components/typo";
 import { colors, spacingX, spacingY } from "@/constants/theme";
+import { useAuth } from "@/context/auth-context";
 import { verticalScale } from "@/utils/styling";
 
 const Register = () => {
@@ -19,18 +20,22 @@ const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
+  const { register: registerUser } = useAuth();
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!emailRef.current || !passwordRef.current || !nameRef.current) {
       Alert.alert("Sign up", "Please fill all the fields");
       return;
     }
 
-    console.log({
-      email: emailRef.current,
-      password: passwordRef.current,
-      name: nameRef,
-    });
+    setIsLoading(true);
+    const res = await registerUser(
+      emailRef.current,
+      passwordRef.current,
+      nameRef.current
+    );
+    setIsLoading(false);
+    console.log("Register res -->", res);
   };
 
   return (
