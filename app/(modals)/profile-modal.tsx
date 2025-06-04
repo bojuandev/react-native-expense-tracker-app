@@ -11,15 +11,16 @@ import { updateUser } from "@/services/user-service";
 import { UserDataType } from "@/types";
 import { scale, verticalScale } from "@/utils/styling";
 import { Image } from "expo-image";
+import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import * as Icons from "phosphor-react-native";
 import React, { useEffect, useState } from "react";
 import {
-    Alert,
-    ScrollView,
-    StyleSheet,
-    TouchableOpacity,
-    View,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 const ProfileModal = () => {
@@ -59,6 +60,21 @@ const ProfileModal = () => {
     }
   };
 
+  const onPickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      // allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.5,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setUserData({ ...userData, image: result.assets[0] });
+    }
+  };
+
   return (
     <ModalWrapper>
       <View style={styles.container}>
@@ -73,12 +89,12 @@ const ProfileModal = () => {
         <View style={styles.avatarContainer}>
           <Image
             style={styles.avatar}
-            source={getProfileImage(null)}
+            source={getProfileImage(userData.image)}
             contentFit="cover"
             transition={100}
           />
 
-          <TouchableOpacity style={styles.editIcon}>
+          <TouchableOpacity onPress={onPickImage} style={styles.editIcon}>
             <Icons.Pencil size={verticalScale(20)} color={colors.neutral800} />
           </TouchableOpacity>
         </View>
