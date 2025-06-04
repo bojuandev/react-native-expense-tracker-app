@@ -1,6 +1,6 @@
 import { auth, firestore } from "@/config/firebase";
 import { AuthContextType, UserType } from "@/types";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
@@ -15,6 +15,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<UserType>(null);
+   const router = useRouter();
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (firebaseUser) => {

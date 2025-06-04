@@ -8,7 +8,7 @@ import { getProfileImage } from "@/services/image-service";
 import { accountOptionType } from "@/types";
 import { verticalScale } from "@/utils/styling";
 import { Image } from "expo-image";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import { signOut } from "firebase/auth";
 import * as Icons from "phosphor-react-native";
 import React from "react";
@@ -16,6 +16,7 @@ import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
 const Profile = () => {
+   const router = useRouter();
   const { user } = useAuth();
 
   const accountOptions: accountOptionType[] = [
