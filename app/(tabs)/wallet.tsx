@@ -1,16 +1,37 @@
+import Loading from "@/components/loading";
 import ScreenWrapper from "@/components/screen-wrapper";
 import Typo from "@/components/typo";
+import WalletListItem from "@/components/wallet-list-item";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
+import { useAuth } from "@/context/auth-context";
+import useFetchData from "@/hooks/use-fetch-data";
+import { WalletType } from "@/types";
 import { verticalScale } from "@/utils/styling";
 import { useRouter } from "expo-router";
+import { orderBy, where } from "firebase/firestore";
 import * as Icons from "phosphor-react-native";
 import React from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
 
 const Wallet = () => {
   const router = useRouter();
+  const { user } = useAuth();
+
+  const {
+    data: wallets,
+    error,
+    loading,
+  } = useFetchData<WalletType>("wallets", [
+    where("uid", "==", user?.uid),
+    orderBy("created", "desc"),
+  ]);
+
   const getTotalBalance = () => {
-    return 2344;
+    return wallets.reduce((total, item) => {
+      total = total + (item.amount || 0);
+
+      return total;
+    }, 0);
   };
 
   return (
@@ -34,7 +55,9 @@ const Wallet = () => {
             <Typo size={20} fontWeight={"500"}>
               My wallets
             </Typo>
-            <TouchableOpacity onPress={() => router.push("/(modals)/wallet-modal")}>
+            <TouchableOpacity
+              onPress={() => router.push("/(modals)/wallet-modal")}
+            >
               <Icons.PlusCircle
                 weight="fill"
                 color={colors.primary}
@@ -43,6 +66,16 @@ const Wallet = () => {
             </TouchableOpacity>
           </View>
           {/* todo: wallets list  */}
+          {loading && <Loading />}
+          <FlatList
+            data={wallets}
+            renderItem={({ item, index }) => {
+              return (
+                <WalletListItem item={item} index={index} router={router} />
+              );
+            }}
+            contentContainerStyle={styles.listStyle}
+          />
         </View>
       </View>
     </ScreenWrapper>
