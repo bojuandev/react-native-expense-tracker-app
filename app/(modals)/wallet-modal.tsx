@@ -7,10 +7,9 @@ import ModalWrapper from "@/components/modal-wrapper";
 import Typo from "@/components/typo";
 import { colors, spacingX, spacingY } from "@/constants/theme";
 import { useAuth } from "@/context/auth-context";
-import { updateUser } from "@/services/user-service";
+import { createOrUpdateWallet } from "@/services/wallet-service";
 import { WalletType } from "@/types";
 import { scale, verticalScale } from "@/utils/styling";
-import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 
 import React, { useState } from "react";
@@ -18,7 +17,7 @@ import { Alert, ScrollView, StyleSheet, View } from "react-native";
 
 const WalletModal = () => {
   const router = useRouter();
-  const { user, updateUserData } = useAuth();
+  const { user } = useAuth();
 
   const [wallet, setWallet] = useState<WalletType>({
     name: "",
@@ -30,35 +29,25 @@ const WalletModal = () => {
   const onSubmit = async () => {
     let { name, image } = wallet;
 
-    if (!name.trim()) {
+    if (!name.trim() || !image) {
       Alert.alert("Wallet", "Please fill all the fields");
       return;
     }
 
+    const data: WalletType = {
+      name,
+      image,
+      uid: user?.uid,
+    };
+
     setLoading(true);
-    const res = await updateUser(user?.uid as string, wallet);
+    const res = await createOrUpdateWallet(data);
     setLoading(false);
 
     if (res.success) {
-      updateUserData(user?.uid as string);
       router.back();
     } else {
       Alert.alert("User", res.msg);
-    }
-  };
-
-  const onPickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
-      // allowsEditing: true,
-      aspect: [4, 3],
-      quality: 0.5,
-    });
-
-    console.log(result);
-
-    if (!result.canceled) {
-      //setWallet({ ...wallet, image: result.assets[0] });
     }
   };
 
