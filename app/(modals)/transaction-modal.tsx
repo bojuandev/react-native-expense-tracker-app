@@ -15,6 +15,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { orderBy, where } from "firebase/firestore";
 
 import Input from "@/components/input";
+import { createOrUpdateTransaction } from "@/services/transaction-service";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as Icons from "phosphor-react-native";
 import React, { useState } from "react";
@@ -93,7 +94,18 @@ const TransactionModal = () => {
       uid: user?.uid,
     };
 
-    console.log("submit transaction -->", transactionData)
+    console.log("submit transaction -->", transactionData);
+
+    setLoading(true);
+    const res = await createOrUpdateTransaction(transactionData);
+
+    setLoading(false);
+
+    if (res.success) {
+      router.back();
+    } else {
+      Alert.alert(" Transaction", res.msg);
+    }
   };
 
   const onDelete = async () => {
@@ -141,7 +153,7 @@ const TransactionModal = () => {
       {/* form */}
       <ScrollView
         contentContainerStyle={styles.form}
-        showsVerticalScrollIndicator={false}
+        showsVerticalScrollIndicator={true}
       >
         {/* Transaction Type */}
         <View style={styles.inputContainer}>
@@ -357,12 +369,12 @@ export default TransactionModal;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     paddingHorizontal: spacingY._20,
   },
   form: {
     gap: spacingY._30,
     paddingVertical: spacingY._15,
+    paddingHorizontal: spacingY._20,
     paddingBottom: spacingY._40,
   },
   footer: {
