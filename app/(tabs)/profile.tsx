@@ -16,7 +16,7 @@ import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
 const Profile = () => {
-   const router = useRouter();
+  const router = useRouter();
   const { user } = useAuth();
 
   const accountOptions: accountOptionType[] = [
